@@ -30,7 +30,7 @@ Example / Ejemplo:
 </body>
 ```
 And / Y
-<br/>app/elements/hello.html
+<br/>app/src/elements/hello.html
 <br/>with code / con el codigo
 ```
 <div>
