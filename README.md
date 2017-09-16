@@ -26,7 +26,7 @@ Example / Ejemplo:
 <br/>with code / con el codigo
 ```
 <body>
-  <!-- @import src/elements/hello.html -->
+  <!-- @import elements/hello.html -->
 </body>
 ```
 And / Y
