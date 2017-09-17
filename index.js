@@ -38,8 +38,24 @@ function start(){
   });
 
   watch(__dirname+'/app/src', { recursive: true }, function(evt, name) {
-    if(name.indexOf('-tocompile') > 0 ) checkFile(name);
-    if(name.indexOf('.scss') > 0 ) checkFileCss(name);
+    switch (true) {
+      case (name.indexOf('-tocompile') > 0 ):
+        checkFile(name);
+        break;
+      case (name.indexOf('.scss') > 0 ):
+        checkFileCss(name);
+        break;
+      default:
+        getDirectories('app/src', function (err, res) {
+          if (err) {
+            console.log('Error', err);
+          } else {
+            for (var i = 0; i < res.length; i++) {
+              if(res[i].indexOf('-tocompile') > 0) checkFile(__dirname+'/'+res[i]);
+            }
+          }
+        });
+    }
   });
 }
 
@@ -54,10 +70,6 @@ function checkFileCss(name){
   var filepath = name;
   var filename = filepath.split('/').reverse()[0].replace('scss','css');
 
-  // var output = sass.renderSync({
-  //   file: filepath,
-  //   outFile: __dirname+'/app/output/assets/css/'+filename
-  // });
   sass.render({
     file: filepath,
     outFile: __dirname+'/app/output/assets/css/'+filename
@@ -74,10 +86,6 @@ function checkFileCss(name){
       });
     }
   });
-
-
-
-
 }
 
 var getDirectories = function (src, callback) {
