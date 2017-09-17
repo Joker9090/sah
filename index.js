@@ -54,18 +54,29 @@ function checkFileCss(name){
   var filepath = name;
   var filename = filepath.split('/').reverse()[0].replace('scss','css');
 
-  var output = sass.renderSync({
+  // var output = sass.renderSync({
+  //   file: filepath,
+  //   outFile: __dirname+'/app/output/assets/css/'+filename
+  // });
+  sass.render({
     file: filepath,
     outFile: __dirname+'/app/output/assets/css/'+filename
-  });
-  console.log(__dirname+'/app/output/assets/css/'+filename)
-
-  fs.writeFile(__dirname+'/app/output/assets/css/'+filename, output.css.toString(), function(err) {
-    if(err) {
-        return console.log(err);
+  }, function(err, result) {
+    if(err){
+      console.log(err)
+    }else{
+      console.log(__dirname+'/app/output/assets/css/'+filename)
+      fs.writeFile(__dirname+'/app/output/assets/css/'+filename, result.css.toString(), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("Archivo sass modificado!");
+      });
     }
-    console.log("Archivo sass modificado!");
   });
+
+
+
 
 }
 
