@@ -18,6 +18,14 @@ how it work / como funciona
 npm run start
 ```
 
+### NOW WITH AUTOPREFIXER / Ahora con autoprefixer
+
+In / en index.js
+
+```
+var AUTOPREFIXER = true; // or false, as you wish , como quieras
+```
+
 The files with -tocompile.html inside app/src will be compiled and delivered in app/output
 <br />Los archivos con -tocompile.html que esten en app/src seran compialados y enviados a app/output
 
@@ -86,13 +94,4 @@ app/output/
 app/output/css
 app/src/
 app/src/sass/
-```
-
-
-###NOW WITH AUTOPREFIXER / Ahora con autoprefixer
-
-In / en index.js
-
-```
-var AUTOPREFIXER = true; // or false, as you wish , como quieras
 ```
