@@ -4,6 +4,10 @@ var fs = require('fs');
 var glob = require('glob');
 var sass = require('node-sass');
 
+var autoprefixer = require('autoprefixer');
+var postcss = require('postcss');
+
+var AUTOPREFIXER = true;
 
 function checkIfReRunFuse(outputFile){
   fs.readFile(outputFile, 'utf8', function(err, contents) {
@@ -78,12 +82,27 @@ function checkFileCss(name){
       console.log(err)
     }else{
       console.log(__dirname+'/app/output/assets/css/'+filename)
-      fs.writeFile(__dirname+'/app/output/assets/css/'+filename, result.css.toString(), function(err) {
-        if(err) {
-            return console.log(err);
-        }
-        console.log("Archivo sass modificado!");
-      });
+      if(AUTOPREFIXER){
+        postcss([ autoprefixer ]).process(result.css).then(function (result) {
+          result.warnings().forEach(function (warn) {
+            console.warn(warn.toString());
+          });
+          fs.writeFile(__dirname+'/app/output/assets/css/'+filename, result.css.toString(), function(err) {
+            if(err) {
+                return console.log(err);
+            }
+            console.log("Archivo sass modificado!");
+          });
+        });
+      }else{
+        fs.writeFile(__dirname+'/app/output/assets/css/'+filename, result.css.toString(), function(err) {
+          if(err) {
+              return console.log(err);
+          }
+          console.log("Archivo sass modificado!");
+        });
+
+      }
     }
   });
 }

@@ -10,11 +10,13 @@
   "author": "barto",
   "license": "ISC",
   "dependencies": {
+    "autoprefixer": "^7.1.4",
     "fuse": "^0.4.0",
     "glob": "^7.1.2",
     "minimist": "^1.2.0",
     "node-sass": "^4.5.3",
     "node-watch": "^0.5.5",
+    "postcss-cli": "^4.1.1",
     "watch": "^1.0.2"
   }
 }

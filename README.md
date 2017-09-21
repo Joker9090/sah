@@ -87,3 +87,12 @@ app/output/css
 app/src/
 app/src/sass/
 ```
+
+
+###NOW WITH AUTOPREFIXER / Ahora con autoprefixer
+
+In / en index.js
+
+```
+var AUTOPREFIXER = true; // or false, as you wish , como quieras
+```
