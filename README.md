@@ -18,7 +18,16 @@ how it work / como funciona
 npm run start
 ```
 
-### NOW WITH AUTOPREFIXER / Ahora con autoprefixer
+### UPDATES
+
+```
+- Windows path / \\ fixed
+- Now can use -nocompile.scss and use @import in scss files to make one file instead severals.
+- Compile imported scss without change-needed in where is imported parent file
+- Display name of file modified
+```
+
+### AUTOPREFIXER / Ahora con autoprefixer
 
 In / en index.js
 

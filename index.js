@@ -6,6 +6,11 @@ var sass = require('node-sass');
 
 var autoprefixer = require('autoprefixer');
 var postcss = require('postcss');
+var isWin = process.platform === "win32";
+
+function cleanWinPath(string){
+  return string.replace(/\\/g,"/")
+}
 
 var AUTOPREFIXER = true;
 
@@ -13,10 +18,10 @@ function checkIfReRunFuse(outputFile){
   fs.readFile(outputFile, 'utf8', function(err, contents) {
     if(typeof contents != "undefined" ){
       if( ( contents.indexOf("@import")  >= 0) || (contents.indexOf("@depends")  >= 0) || (contents.indexOf("@include")  >= 0) ) {
-        console.log("Vuelve a fusionar "+outputFile);
+        console.log("[RE FUSE] import in import >"+outputFile);
         runFuse(outputFile,outputFile)
       }else{
-          console.log("Archivo html modificado!");
+          console.log("[MODIFIED] HTML FILE > "+ outputFile);
         return true
       }
     }
@@ -65,15 +70,30 @@ function start(){
 
 function checkFile(name){
   var filepath = name;
-  var filename = filepath.split('/').reverse()[0].replace('-tocompile','');
-  console.log('%s changed.', name);
+  var filename = cleanWinPath(filepath).split('/').reverse()[0].replace('-tocompile','');
+  console.log('[CAHNGED] FILE > %s ', name);
   runFuse(name,__dirname+'/app/output/'+filename);
+}
+
+function checkAllSassFiles(){
+  getDirectories('app/src', function (err, res) {
+    if (err) {
+      console.log('Error', err);
+    } else {
+      for (var i = 0; i < res.length; i++) {
+        if(res[i].indexOf('.scss') > 0 && res[i].indexOf('-nocompile') == -1 ) checkFileCss(__dirname+'/'+res[i]);
+      }
+    }
+  })
 }
 
 function checkFileCss(name){
   var filepath = name;
-  var filename = filepath.split('/').reverse()[0].replace('scss','css');
-
+  var filename = cleanWinPath(filepath).split('/').reverse()[0].replace('scss','css');
+  if(filename.indexOf("-nocompile") != -1) {
+    checkAllSassFiles()
+    return false;
+  }
   sass.render({
     file: filepath,
     outFile: __dirname+'/app/output/assets/css/'+filename
@@ -81,9 +101,8 @@ function checkFileCss(name){
     if(err){
       console.log(err)
     }else{
-      console.log(__dirname+'/app/output/assets/css/'+filename)
       if(AUTOPREFIXER){
-        postcss([ autoprefixer ]).process(result.css).then(function (result) {
+        postcss([ autoprefixer ]).process(result.css,{from: undefined}).then(function (result) {
           result.warnings().forEach(function (warn) {
             console.warn(warn.toString());
           });
@@ -91,15 +110,16 @@ function checkFileCss(name){
             if(err) {
                 return console.log(err);
             }
-            console.log("Archivo sass modificado!");
+            console.log("[MODIFIED] SASS FILE > "+ __dirname+'/app/output/assets/css/'+filename);
           });
         });
       }else{
+        console.log("aca 2")
         fs.writeFile(__dirname+'/app/output/assets/css/'+filename, result.css.toString(), function(err) {
           if(err) {
               return console.log(err);
           }
-          console.log("Archivo sass modificado!");
+          console.log("[MODIFIED] SASS FILE > "+ __dirname+'/app/output/assets/css/'+filename);
         });
 
       }
@@ -116,20 +136,20 @@ checkTreeFolder = function(){
   function createFile(objs,end) {
     next = function(){
       if(objs.length > 1){
-        console.log("sigue",objs.length)
+        console.log("Check Next",objs.length)
         objs.shift();
         createFile(objs,end);
       }else end()
     }
     var obj = objs[0];
     var filepath = obj.path;
-    var filename = filepath.split('/').reverse()[0];
+    var filename = cleanWinPath(filepath).split('/').reverse()[0];
     fs.open(filepath,'r',function(err, fd){
       if (err) {
         switch (true) {
           case obj.type == "folder":
             fs.mkdir(filepath,function(){
-              console.log("creo")
+              console.log("[CREATE] FILE >", filepath)
               next();
             });
 
@@ -137,12 +157,12 @@ checkTreeFolder = function(){
           default:
             fs.writeFile(filepath, '', function(err) {
               if(err) { console.log(err); }
-              console.log("Creo archivo!", filepath);
+              console.log("[CREATE] FILE >", filepath);
               next();
             });
         }
       } else {
-        console.log("El archivo existe!");
+        console.log("[FOUND] BASE FILE >", filepath);
         next();
       }
     });
